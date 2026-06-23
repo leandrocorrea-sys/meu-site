@@ -1,101 +1,69 @@
 <!DOCTYPE html>  
 <html lang="pt-BR">  
 <head>  
-  <meta charset="UTF-8">  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-  <title>Painel de Alertas</title>  
-  <link rel="stylesheet" href="style.css">  
+  <meta charset="UTF-8" />  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />  
+  <title>Painel de Treinamentos</title>  
+  <link rel="stylesheet" href="style.css" />  
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>  
 </head>  
 <body>  
   <div class="app">  
     <header class="topbar">  
-      <div class="logo-area">  
-        <div class="logo">🎓</div>  
-      </div>  
-  
+      <div class="logo">🎓</div>  
       <div class="user-area">  
-        <span>Leandro Pastega</span>  
-        <button class="logout-btn">↗</button>  
+        <span>Painel de Treinamentos</span>  
       </div>  
     </header>  
   
     <main class="container">  
+      <section class="upload-box">  
+        <h1>Matriz de Treinamentos</h1>  
+        <p>Selecione a planilha .xlsx para carregar os dados</p>  
+        <input type="file" id="fileInput" accept=".xlsx,.xls" />  
+      </section>  
+  
       <section class="summary-grid">  
         <div class="summary-card">  
-          <div class="icon yellow">🕒</div>  
+          <div class="icon blue">👥</div>  
           <div>  
-            <h2>12</h2>  
-            <p>Pendentes</p>  
+            <h2 id="totalAnalistas">0</h2>  
+            <p>Analistas</p>  
           </div>  
         </div>  
   
         <div class="summary-card">  
-          <div class="icon blue">➜</div>  
+          <div class="icon green">✅</div>  
           <div>  
-            <h2>7</h2>  
-            <p>Em Tratativa</p>  
+            <h2 id="totalConcluidos">0</h2>  
+            <p>Treinamentos concluídos</p>  
           </div>  
         </div>  
   
         <div class="summary-card">  
-          <div class="icon green">✔</div>  
+          <div class="icon red">❌</div>  
           <div>  
-            <h2>5</h2>  
-            <p>Concluídos</p>  
+            <h2 id="totalPendentes">0</h2>  
+            <p>Treinamentos pendentes</p>  
           </div>  
         </div>  
   
         <div class="summary-card">  
-          <div class="icon red">⚠</div>  
+          <div class="icon yellow">📊</div>  
           <div>  
-            <h2>6</h2>  
-            <p>Urgentes</p>  
+            <h2 id="mediaPercentual">0%</h2>  
+            <p>Média de conclusão</p>  
           </div>  
         </div>  
       </section>  
   
-      <section class="filters-row">  
-        <div class="tabs">  
-          <button class="tab active">Todos</button>  
-          <button class="tab">Pendentes</button>  
-          <button class="tab">Em Tratativa</button>  
-          <button class="tab">Concluídos</button>  
+      <section class="table-card">  
+        <div class="table-header">  
+          <h3>Analistas e status dos treinamentos</h3>  
         </div>  
   
-        <div class="actions">  
-          <select class="select">  
-            <option>Regional</option>  
-            <option>SPI</option>  
-            <option>SPO</option>  
-          </select>  
-          <button class="new-alert-btn">＋ Novo Alerta</button>  
-        </div>  
-      </section>  
-  
-      <section class="alert-card">  
-        <div class="alert-header">  
-          <h3>NR-12 Segurança em Máquinas</h3>  
-          <div class="badges">  
-            <span class="badge blue-badge">Em Tratativa</span>  
-            <span class="badge red-badge">Alta</span>  
-          </div>  
-        </div>  
-  
-        <div class="alert-meta">  
-          <span>👤 Carlos Mendes</span>  
-          <span>📍 SPI</span>  
-          <span>🏭 Produção</span>  
-          <span>📅 10/06/2026</span>  
-        </div>  
-  
-        <div class="alert-note">  
-          <span>💬 teste123</span>  
-        </div>  
-  
-        <div class="alert-footer">  
-          <button class="link-btn">✏ Editar</button>  
-          <button class="link-btn">📁 Evidência</button>  
-          <button class="primary-btn">Concluir</button>  
+        <div id="tableContainer" class="table-container">  
+          <p class="placeholder">Nenhuma planilha carregada ainda.</p>  
         </div>  
       </section>  
     </main>  
