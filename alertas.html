@@ -1,0 +1,39 @@
+<!DOCTYPE html>  
+<html lang="pt-BR">  
+<head>  
+  <meta charset="UTF-8">  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+  <title>Alertas por Regional</title>  
+  <link rel="stylesheet" href="style.css">  
+</head>  
+<body>  
+  <div class="app">  
+    <header class="topbar">  
+      <div class="logo">🎓</div>  
+      <div class="user-area">  
+        <span>Alertas por Regional</span>  
+      </div>  
+    </header>  
+  
+    <main class="container">  
+      <div class="page-actions" style="justify-content: space-between; margin-bottom: 20px;">  
+        <h1 style="font-size: 28px;">Alertas gerados</h1>  
+        <a href="index.html" class="new-alert-btn" style="text-decoration: none; display: inline-flex; align-items: center;">  
+          Voltar para painel  
+        </a>  
+      </div>  
+  
+      <section class="table-card">  
+        <div class="table-header">  
+          <h3>Regionais com 10+ analistas pendentes</h3>  
+        </div>  
+        <div id="alertsPageContainer" class="alerts-grid">  
+          <p class="placeholder">Nenhum alerta carregado.</p>  
+        </div>  
+      </section>  
+    </main>  
+  </div>  
+  
+  <script src="alertas.js"></script>  
+</body>  
+</html>

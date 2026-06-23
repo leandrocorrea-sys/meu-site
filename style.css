@@ -231,4 +231,8 @@ td {
   padding: 6px 10px;  
   font-size: 12px;  
   font-weight: bold;  
+}.page-actions {  
+  display: flex;  
+  justify-content: flex-end;  
+  margin-top: 16px;  
 }
