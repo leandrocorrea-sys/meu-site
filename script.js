@@ -1,5 +1,6 @@
 const fileInput = document.getElementById("fileInput");  
 const tableContainer = document.getElementById("tableContainer");  
+const alertsContainer = document.getElementById("alertsContainer");  
   
 const totalAnalistasEl = document.getElementById("totalAnalistas");  
 const totalConcluidosEl = document.getElementById("totalConcluidos");  
@@ -42,6 +43,7 @@ function handleFile(event) {
   
     if (headerRowIndex === -1) {  
       tableContainer.innerHTML = `<p class="placeholder">Não foi possível encontrar a linha de cabeçalho da planilha.</p>`;  
+      alertsContainer.innerHTML = `<p class="placeholder">Sem alertas.</p>`;  
       return;  
     }  
   
@@ -59,6 +61,7 @@ function handleFile(event) {
       .filter(row => String(row["Nome"] || row["Email"] || "").trim() !== "");  
   
     renderDashboard(rows);  
+    renderAlertsByRegional(rows);  
   };  
   
   reader.readAsArrayBuffer(file);  
@@ -79,6 +82,7 @@ function renderDashboard(rows) {
           <th>Cargo</th>  
           <th>Hub</th>  
           <th>Supervisor</th>  
+          <th>Regional</th>  
           <th>%</th>  
           ${trainingColumns.map(col => `<th>${col}</th>`).join("")}  
         </tr>  
@@ -87,8 +91,7 @@ function renderDashboard(rows) {
   `;  
   
   rows.forEach(row => {  
-    const percentualBruto = row["% de Treinamentos por analista"];  
-    const percentual = Number(percentualBruto || 0);  
+    const percentual = Number(row["% de Treinamentos por analista"] || 0);  
     somaPercentual += percentual;  
   
     const trainingCells = trainingColumns.map(col => {  
@@ -114,6 +117,7 @@ function renderDashboard(rows) {
         <td>${escapeHtml(row["Cargo"] || "-")}</td>  
         <td>${escapeHtml(row["Hub name"] || "-")}</td>  
         <td>${escapeHtml(row["Nome do Supervisor"] || "-")}</td>  
+        <td>${escapeHtml(row["Regional"] || "-")}</td>  
         <td class="percent">${(percentual * 100).toFixed(0)}%</td>  
         ${trainingCells}  
       </tr>  
@@ -132,6 +136,67 @@ function renderDashboard(rows) {
   mediaPercentualEl.textContent = `${mediaPercentual}%`;  
   
   tableContainer.innerHTML = tableHTML;  
+}  
+  
+function renderAlertsByRegional(rows) {  
+  const grouped = {};  
+  
+  rows.forEach(row => {  
+    const regional = String(row["Regional"] || "Sem regional").trim();  
+    const nome = String(row["Nome"] || "-").trim();  
+  
+    trainingColumns.forEach(col => {  
+      const value = String(row[col] || "").trim();  
+  
+      if (value === "❌") {  
+        if (!grouped[regional]) {  
+          grouped[regional] = {  
+            totalPendencias: 0,  
+            analistas: new Set(),  
+            treinamentos: {}  
+          };  
+        }  
+  
+        grouped[regional].totalPendencias++;  
+        grouped[regional].analistas.add(nome);  
+        grouped[regional].treinamentos[col] = (grouped[regional].treinamentos[col] || 0) + 1;  
+      }  
+    });  
+  });  
+  
+  const regionals = Object.entries(grouped)  
+    .sort((a, b) => b[1].totalPendencias - a[1].totalPendencias);  
+  
+  if (regionals.length === 0) {  
+    alertsContainer.innerHTML = `<p class="placeholder">Nenhum alerta de pendência encontrado 🎉</p>`;  
+    return;  
+  }  
+  
+  let html = "";  
+  
+  regionals.forEach(([regional, data]) => {  
+    const topTrainings = Object.entries(data.treinamentos)  
+      .sort((a, b) => b[1] - a[1])  
+      .map(([training, count]) => {  
+        return `<span class="training-pill">${escapeHtml(training)}: ${count}</span>`;  
+      })  
+      .join("");  
+  
+    html += `  
+      <div class="alert-card">  
+        <h4>🚨 Regional ${escapeHtml(regional)}</h4>  
+        <div class="alert-meta">  
+          <span><strong>${data.totalPendencias}</strong> pendências</span>  
+          <span><strong>${data.analistas.size}</strong> analistas impactados</span>  
+        </div>  
+        <div class="alert-trainings">  
+          ${topTrainings}  
+        </div>  
+      </div>  
+    `;  
+  });  
+  
+  alertsContainer.innerHTML = html;  
 }  
   
 function escapeHtml(value) {  

@@ -191,4 +191,44 @@ td {
   .summary-grid {  
     grid-template-columns: 1fr;  
   }  
+}.alerts-grid {  
+  display: grid;  
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));  
+  gap: 16px;  
+}  
+  
+.alert-card {  
+  border: 1px solid #f3d1d1;  
+  background: #fff7f7;  
+  border-radius: 18px;  
+  padding: 18px;  
+}  
+  
+.alert-card h4 {  
+  font-size: 20px;  
+  margin-bottom: 10px;  
+  color: #b91c1c;  
+}  
+  
+.alert-meta {  
+  display: flex;  
+  flex-direction: column;  
+  gap: 6px;  
+  color: #374151;  
+  margin-bottom: 12px;  
+}  
+  
+.alert-trainings {  
+  display: flex;  
+  flex-wrap: wrap;  
+  gap: 8px;  
+}  
+  
+.training-pill {  
+  background: #fee2e2;  
+  color: #b91c1c;  
+  border-radius: 999px;  
+  padding: 6px 10px;  
+  font-size: 12px;  
+  font-weight: bold;  
 }
