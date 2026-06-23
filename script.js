@@ -31,11 +31,34 @@ function handleFile(event) {
     const firstSheetName = workbook.SheetNames[0];  
     const worksheet = workbook.Sheets[firstSheetName];  
   
-    const json = XLSX.utils.sheet_to_json(worksheet, { defval: "" });  
+    const raw = XLSX.utils.sheet_to_json(worksheet, {  
+      header: 1,  
+      defval: ""  
+    });  
   
-    const validRows = json.filter(row => row["Nome"] || row["Email"]);  
+    const headerRowIndex = raw.findIndex(row =>  
+      row.some(cell => String(cell).trim() === "Nome")  
+    );  
   
-    renderDashboard(validRows);  
+    if (headerRowIndex === -1) {  
+      tableContainer.innerHTML = `<p class="placeholder">Não foi possível encontrar a linha de cabeçalho da planilha.</p>`;  
+      return;  
+    }  
+  
+    const headers = raw[headerRowIndex].map(h => String(h).trim());  
+    const dataRows = raw.slice(headerRowIndex + 1);  
+  
+    const rows = dataRows  
+      .map(row => {  
+        const obj = {};  
+        headers.forEach((header, index) => {  
+          obj[header] = row[index] ?? "";  
+        });  
+        return obj;  
+      })  
+      .filter(row => String(row["Nome"] || row["Email"] || "").trim() !== "");  
+  
+    renderDashboard(rows);  
   };  
   
   reader.readAsArrayBuffer(file);  
@@ -64,7 +87,8 @@ function renderDashboard(rows) {
   `;  
   
   rows.forEach(row => {  
-    const percentual = Number(row["% de Treinamentos por analista"] || 0);  
+    const percentualBruto = row["% de Treinamentos por analista"];  
+    const percentual = Number(percentualBruto || 0);  
     somaPercentual += percentual;  
   
     const trainingCells = trainingColumns.map(col => {  
