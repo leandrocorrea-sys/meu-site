@@ -17,6 +17,15 @@ const trainingColumns = [
   "AlocAção_V2"  
 ];  
   
+// Treinamentos que geram alerta  
+const alertTrainingColumns = [  
+  "EHA 3+ & Realocação de Pacotes",  
+  "Reversão de No Show"  
+];  
+  
+// mínimo para gerar alerta  
+const alertThreshold = 10;  
+  
 fileInput.addEventListener("change", handleFile);  
   
 function handleFile(event) {  
@@ -145,7 +154,7 @@ function renderAlertsByRegional(rows) {
     const regional = String(row["Regional"] || "Sem regional").trim();  
     const nome = String(row["Nome"] || "-").trim();  
   
-    trainingColumns.forEach(col => {  
+    alertTrainingColumns.forEach(col => {  
       const value = String(row[col] || "").trim();  
   
       if (value === "❌") {  
@@ -164,17 +173,22 @@ function renderAlertsByRegional(rows) {
     });  
   });  
   
-  const regionals = Object.entries(grouped)  
-    .sort((a, b) => b[1].totalPendencias - a[1].totalPendencias);  
+  const filteredRegionals = Object.entries(grouped)  
+    .filter(([_, data]) => data.analistas.size >= alertThreshold)  
+    .sort((a, b) => b[1].analistas.size - a[1].analistas.size);  
   
-  if (regionals.length === 0) {  
-    alertsContainer.innerHTML = `<p class="placeholder">Nenhum alerta de pendência encontrado 🎉</p>`;  
+  if (filteredRegionals.length === 0) {  
+    alertsContainer.innerHTML = `  
+      <p class="placeholder">  
+        Nenhuma regional atingiu o limite de ${alertThreshold} analistas pendentes nesses treinamentos ✅  
+      </p>  
+    `;  
     return;  
   }  
   
   let html = "";  
   
-  regionals.forEach(([regional, data]) => {  
+  filteredRegionals.forEach(([regional, data]) => {  
     const topTrainings = Object.entries(data.treinamentos)  
       .sort((a, b) => b[1] - a[1])  
       .map(([training, count]) => {  
@@ -186,8 +200,9 @@ function renderAlertsByRegional(rows) {
       <div class="alert-card">  
         <h4>🚨 Regional ${escapeHtml(regional)}</h4>  
         <div class="alert-meta">  
-          <span><strong>${data.totalPendencias}</strong> pendências</span>  
-          <span><strong>${data.analistas.size}</strong> analistas impactados</span>  
+          <span><strong>${data.analistas.size}</strong> analistas pendentes</span>  
+          <span><strong>${data.totalPendencias}</strong> pendências nesses 2 treinamentos</span>  
+          <span>Regra de alerta: mínimo de ${alertThreshold} analistas</span>  
         </div>  
         <div class="alert-trainings">  
           ${topTrainings}  
